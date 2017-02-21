@@ -464,7 +464,7 @@
                  */
 
                 // Move nodes up and down in nesting level.
-                if (moveWithinTree && pos.dirAx) {
+                if (moveWithinTree && pos.dirAx && config.isLevelChangeOnHorizontalMove) {
 
                   // increase horizontal level if previous sibling exists and is not collapsed
                   // example 1.1.1 becomes 1.2
