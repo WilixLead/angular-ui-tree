@@ -497,7 +497,28 @@
                   isEmpty = false;
 
                   //Exit if target is not a uiTree or child of one.
-                  if (!targetNode) {
+                  if (!targetNode ) {
+                      if (pos.distY < 0) {
+                          prev = dragInfo.prev();
+                          if (prev && !prev.collapsed && prev.accept(scope, prev.childNodesCount())) {
+                              prev.$childNodesScope.$element.append(placeElm);
+                              dragInfo.moveTo(prev.$childNodesScope, prev.childNodes(), prev.childNodesCount());
+                          }
+                      }
+
+                      if (pos.distY > 0) {
+                          next = dragInfo.next();
+                          if (!next) {
+                              target = dragInfo.parentNode();
+                              if (target && target.$parentNodesScope.accept(scope, target.index() + 1)) {
+                                  target.$element.after(placeElm);
+                                  dragInfo.moveTo(target.$parentNodesScope, target.siblings(), target.index() + 1);
+                              }
+                          } else {
+                              next.$element.after(placeElm);
+                              dragInfo.moveTo(next.$parentNodesScope, next.siblings(), next.index() + 1);
+                          }
+                      }
                     return;
                   }
 
@@ -521,13 +542,24 @@
 
                     // Allow node to return to its original position if no longer hovering over target
                     if (config.appendChildOnHover) {
-                      next = dragInfo.next();
-                      if (!next && unhover) {
-                        target = dragInfo.parentNode();
-                        target.$element.after(placeElm);
-                        dragInfo.moveTo(target.$parentNodesScope, target.siblings(), target.index() + 1);
-                        unhover = false;
-                      }
+                        if (pos.distY > 0) {
+                            next = dragInfo.next();
+                            if (!next && unhover && target) {
+                                target = dragInfo.parentNode();
+                                target.$element.after(placeElm);
+                                dragInfo.moveTo(target.$parentNodesScope, target.siblings(), target.index() + 1);
+                                unhover = false;
+                            }
+                        }
+
+                        if (pos.distY < 0) {
+                            prev = dragInfo.prev();
+                            if (prev && unhover && !prev.collapsed && prev.accept(scope, prev.childNodesCount())) {
+                                prev.$childNodesScope.$element.append(placeElm);
+                                dragInfo.moveTo(prev.$childNodesScope, prev.childNodes(), prev.childNodesCount());
+                                unhover = false;
+                            }
+                        }
                     }
                     return;
                   }
